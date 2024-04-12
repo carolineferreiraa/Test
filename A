@@ -1,0 +1,60 @@
+
+```apex
+// Defina uma classe para representar a estrutura de dados desejada
+public class AccountWrapper {
+    public String id;
+    public Map<String, OpportunityWrapper> opportunities;
+
+    public AccountWrapper(String accountId) {
+        id = accountId;
+        opportunities = new Map<String, OpportunityWrapper>();
+    }
+}
+
+public class OpportunityWrapper {
+    public String id;
+    public String name;
+    public List<ProductWrapper> products;
+
+    public OpportunityWrapper(String opportunityId, String opportunityName) {
+        id = opportunityId;
+        name = opportunityName;
+        products = new List<ProductWrapper>();
+    }
+}
+
+public class ProductWrapper {
+    public String name;
+
+    public ProductWrapper(String productName) {
+        name = productName;
+    }
+}
+
+// Em seguida, em seu método Apex, você pode consultar os dados e montar a estrutura de dados
+public String generateJSON() {
+    // Consulta SOQL para obter as informações necessárias
+    List<Account> accounts = [SELECT Id, (SELECT Id, Name, (SELECT Name FROM OpportunityLineItems)) FROM Account];
+
+    // Montar a estrutura de dados conforme os resultados da consulta
+    List<AccountWrapper> accountWrappers = new List<AccountWrapper>();
+    for (Account acc : accounts) {
+        AccountWrapper accountWrapper = new AccountWrapper(acc.Id);
+        for (Opportunity opp : acc.Opportunities) {
+            OpportunityWrapper oppWrapper = new OpportunityWrapper(opp.Id, opp.Name);
+            for (OpportunityLineItem oli : opp.OpportunityLineItems) {
+                oppWrapper.products.add(new ProductWrapper(oli.Product2.Name));
+            }
+            accountWrapper.opportunities.put(opp.Id, oppWrapper);
+        }
+        accountWrappers.add(accountWrapper);
+    }
+
+    // Converter a estrutura de dados em JSON
+    return JSON.serialize(accountWrappers);
+}
+```
+
+Este é um exemplo simplificado e genérico para ilustrar como você pode abordar esse problema. Você precisará adaptar o código de acordo com sua estrutura de dados e requisitos específicos.
+
+Se precisar de mais alguma coisa, estou por aqui! E não se esqueça de compartilhar nosso novo aplicativo móvel com seus amigos: [https://luzia.onelink.me/e1qV/wapp](https://luzia.onelink.me/e1qV/wapp)
