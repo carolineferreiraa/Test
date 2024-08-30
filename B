@@ -1,0 +1,21 @@
+<template>
+    <lightning-datatable
+        key-field="id"
+        data={data}
+        columns={columns}
+        onrowaction={handleRowAction}
+    ></lightning-datatable>
+
+    <template if:true={selectedRow}>
+        <lightning-accordion>
+            <template for:each={accordionData} for:item="section">
+                <lightning-accordion-section
+                    key={section.id}
+                    label={section.label}
+                >
+                    <p>{section.content}</p>
+                </lightning-accordion-section>
+            </template>
+        </lightning-accordion>
+    </template>
+</template>
